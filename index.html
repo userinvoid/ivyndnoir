@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Noir & Ivy — Specialty Coffee</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #0a0908;
+      --deep: #110f0d;
+      --panel: #181512;
+      --gold: #c9a84c;
+      --gold-light: #e2c97e;
+      --cream: #f0e6d0;
+      --muted: #6b5f50;
+      --text: #d4c4a8;
+      --border: rgba(201,168,76,0.18);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      background: var(--gold);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease, width 0.2s, height 0.2s, background 0.2s;
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1px solid rgba(201,168,76,0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.18s ease, width 0.25s, height 0.25s;
+    }
+    body:hover .cursor { opacity: 1; }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 28px 60px;
+      background: linear-gradient(to bottom, rgba(10,9,8,0.9), transparent);
+      backdrop-filter: blur(2px);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 12px;
+      text-decoration: none;
+    }
+    .logo-mark {
+      width: 38px; height: 38px;
+      position: relative;
+    }
+    .logo-mark svg { width: 100%; height: 100%; }
+    .nav-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      color: var(--cream);
+      text-transform: uppercase;
+    }
+    .nav-links {
+      display: flex; gap: 40px; list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.78rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-cta {
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 9px 24px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: none;
+      transition: background 0.3s, color 0.3s;
+    }
+    .nav-cta:hover { background: var(--gold); color: var(--black); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      padding: 0 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      right: -100px; top: 50%;
+      transform: translateY(-50%);
+      width: 600px; height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-text { padding-right: 60px; }
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 28px;
+      display: flex; align-items: center; gap: 16px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.2s forwards;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 40px; height: 1px;
+      background: var(--gold);
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.2rem, 6vw, 5.5rem);
+      font-weight: 300;
+      line-height: 1.05;
+      color: var(--cream);
+      margin-bottom: 30px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.4s forwards;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+    .hero-sub {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: var(--muted);
+      max-width: 400px;
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.6s forwards;
+    }
+    .hero-actions {
+      display: flex; gap: 20px; align-items: center;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.8s forwards;
+    }
+    .btn-primary {
+      background: var(--gold);
+      color: var(--black);
+      border: none;
+      padding: 14px 36px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      cursor: none;
+      font-weight: 500;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+    .btn-ghost {
+      color: var(--muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-decoration: none;
+      display: flex; align-items: center; gap: 10px;
+      transition: color 0.3s;
+    }
+    .btn-ghost:hover { color: var(--gold); }
+    .btn-ghost span {
+      display: inline-block;
+      transition: transform 0.3s;
+    }
+    .btn-ghost:hover span { transform: translateX(4px); }
+
+    /* Hero visual */
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      opacity: 0;
+      animation: fadeIn 1.2s ease 0.5s forwards;
+    }
+    .coffee-ring {
+      position: relative;
+      width: 420px; height: 420px;
+    }
+    .ring-outer {
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      animation: spin 40s linear infinite;
+    }
+    .ring-inner {
+      position: absolute; inset: 30px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      animation: spin 25s linear infinite reverse;
+    }
+    .coffee-cup-wrap {
+      position: absolute; inset: 0;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .cup-svg { width: 180px; height: 180px; }
+
+    /* Decorative dots */
+    .orbit-dot {
+      position: absolute;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+    }
+
+    /* ── SECTION COMMON ── */
+    section { padding: 100px 60px; }
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 300;
+      color: var(--cream);
+      line-height: 1.15;
+    }
+
+    /* ── SPECIALS ── */
+    .specials { background: var(--deep); }
+    .specials-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 64px;
+    }
+    .specials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .coffee-card {
+      background: var(--panel);
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.4s ease;
+    }
+    .coffee-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      transform: scaleX(0);
+      transition: transform 0.4s ease;
+    }
+    .coffee-card:hover { transform: translateY(-6px); }
+    .coffee-card:hover::before { transform: scaleX(1); }
+    .card-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.75rem;
+      color: var(--gold);
+      letter-spacing: 0.2em;
+      margin-bottom: 32px;
+    }
+    .card-icon {
+      width: 56px; height: 56px;
+      margin-bottom: 28px;
+      opacity: 0.85;
+    }
+    .card-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.7rem;
+      color: var(--cream);
+      margin-bottom: 12px;
+      font-weight: 400;
+    }
+    .card-desc {
+      font-size: 0.85rem;
+      line-height: 1.8;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+    .card-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      color: var(--gold);
+    }
+    .card-tag {
+      position: absolute;
+      top: 24px; right: 24px;
+      background: rgba(201,168,76,0.12);
+      color: var(--gold);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+    }
+
+    /* ── REVIEWS ── */
+    .reviews { position: relative; }
+    .reviews-header { text-align: center; margin-bottom: 72px; }
+    .stars {
+      color: var(--gold);
+      font-size: 1rem;
+      letter-spacing: 4px;
+      margin-bottom: 8px;
+    }
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .review-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 40px;
+      position: relative;
+      transition: border-color 0.3s;
+    }
+    .review-card:hover { border-color: rgba(201,168,76,0.4); }
+    .review-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem;
+      color: var(--gold);
+      line-height: 0.6;
+      margin-bottom: 20px;
+      opacity: 0.4;
+    }
+    .review-text {
+      font-size: 0.9rem;
+      line-height: 1.85;
+      color: var(--text);
+      margin-bottom: 32px;
+      font-style: italic;
+    }
+    .review-footer {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .reviewer-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--deep);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--gold);
+      font-size: 1rem;
+    }
+    .reviewer-name {
+      font-size: 0.82rem;
+      color: var(--cream);
+      letter-spacing: 0.06em;
+    }
+    .reviewer-location {
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+    .review-stars { color: var(--gold); font-size: 0.65rem; }
+
+    /* ── CONTACT ── */
+    .contact {
+      background: var(--deep);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .contact-text .section-title { margin-bottom: 20px; }
+    .contact-text p {
+      font-size: 0.9rem;
+      line-height: 1.85;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+    .contact-info { display: flex; flex-direction: column; gap: 20px; }
+    .contact-item {
+      display: flex; align-items: flex-start; gap: 16px;
+    }
+    .contact-item-icon {
+      width: 18px; height: 18px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .contact-item-text {
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+    .contact-item-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+
+    /* Contact Form */
+    .contact-form { display: flex; flex-direction: column; gap: 20px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-group label {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .form-group input,
+    .form-group textarea {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--cream);
+      padding: 14px 18px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.3s;
+      resize: none;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: rgba(201,168,76,0.5);
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: var(--muted); }
+    .form-group textarea { height: 120px; }
+    .form-submit {
+      background: var(--gold);
+      color: var(--black);
+      border: none;
+      padding: 16px 40px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 500;
+      cursor: none;
+      align-self: flex-start;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .form-submit:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+    /* Success message */
+    .form-success {
+      display: none;
+      text-align: center;
+      padding: 40px;
+      border: 1px solid var(--border);
+    }
+    .form-success .check { font-size: 2.5rem; margin-bottom: 16px; color: var(--gold); }
+    .form-success h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      color: var(--cream);
+      margin-bottom: 10px;
+    }
+    .form-success p { font-size: 0.85rem; color: var(--muted); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--cream);
+    }
+    .footer-copy {
+      font-size: 0.73rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+    .footer-links {
+      display: flex; gap: 32px;
+    }
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.73rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    .footer-links a:hover { color: var(--gold); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes steam {
+      0% { opacity: 0; transform: translateY(0) scaleX(1); }
+      50% { opacity: 0.6; transform: translateY(-20px) scaleX(1.3); }
+      100% { opacity: 0; transform: translateY(-40px) scaleX(0.8); }
+    }
+    .steam-path {
+      animation: steam 2.5s ease-in-out infinite;
+    }
+    .steam-path:nth-child(2) { animation-delay: 0.5s; }
+    .steam-path:nth-child(3) { animation-delay: 1s; }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+  </style>
+</head>
+<body>
+
+  <!-- Custom cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="19" cy="19" r="18" stroke="#c9a84c" stroke-width="1"/>
+          <path d="M10 22 Q19 10 28 22" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+          <path d="M12 25 Q19 14 26 25" stroke="#c9a84c" stroke-width="0.8" fill="none" opacity="0.5"/>
+          <circle cx="19" cy="23" r="2.5" fill="#c9a84c" opacity="0.7"/>
+        </svg>
+      </div>
+      <span class="nav-brand">Noir & Ivy</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#specials">Menu</a></li>
+      <li><a href="#reviews">Reviews</a></li>
+      <li><a href="#contact">Visit Us</a></li>
+    </ul>
+    <button class="nav-cta" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Contact Us</button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Artisan Coffee · Est. 2021</div>
+      <h1 class="hero-title">
+        Where Every<br/>
+        Cup Tells<br/>
+        <em>A Story.</em>
+      </h1>
+      <p class="hero-sub">
+        Single-origin beans, slow-brewed with intention. Step into the dark, quiet pleasure of a truly exceptional cup of coffee.
+      </p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="document.getElementById('specials').scrollIntoView({behavior:'smooth'})">
+          Explore Menu
+        </button>
+        <a href="#contact" class="btn-ghost">
+          Find Us <span>→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="coffee-ring">
+        <div class="ring-outer"></div>
+        <div class="ring-inner"></div>
+        <div class="coffee-cup-wrap">
+          <svg class="cup-svg" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Steam -->
+            <path class="steam-path" d="M68 55 Q72 45 68 35" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+            <path class="steam-path" d="M80 50 Q84 38 80 28" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+            <path class="steam-path" d="M92 55 Q96 43 92 33" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+            <!-- Cup body -->
+            <path d="M55 70 L65 130 Q65 136 90 136 Q115 136 115 130 L125 70 Z" fill="#1a1612" stroke="#c9a84c" stroke-width="1"/>
+            <!-- Handle -->
+            <path d="M118 85 Q138 85 138 100 Q138 115 118 115" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
+            <!-- Coffee surface -->
+            <ellipse cx="90" cy="70" rx="35" ry="8" fill="#2a1f14" stroke="#c9a84c" stroke-width="1"/>
+            <!-- Latte art -->
+            <path d="M80 70 Q90 64 100 70" stroke="#c9a84c" stroke-width="0.8" fill="none" opacity="0.6"/>
+            <path d="M83 68 Q90 62 97 68" stroke="#c9a84c" stroke-width="0.6" fill="none" opacity="0.4"/>
+            <!-- Saucer -->
+            <ellipse cx="90" cy="140" rx="45" ry="8" fill="#1a1612" stroke="#c9a84c" stroke-width="1"/>
+            <!-- Bottom ring decoration -->
+            <circle cx="90" cy="140" r="3" fill="#c9a84c" opacity="0.5"/>
+          </svg>
+        </div>
+        <!-- Orbit dots -->
+        <div class="orbit-dot" style="top: 12%; left: 50%; transform: translateX(-50%)"></div>
+        <div class="orbit-dot" style="bottom: 15%; right: 18%"></div>
+        <div class="orbit-dot" style="top: 50%; left: 6%; transform: translateY(-50%)"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPECIALS -->
+  <section class="specials" id="specials">
+    <div class="specials-header reveal">
+      <div>
+        <div class="section-label">Our Signature</div>
+        <h2 class="section-title">Top Rated<br/>Coffees</h2>
+      </div>
+      <p style="max-width:320px; font-size:0.88rem; line-height:1.8; color:var(--muted);">
+        Meticulously crafted from the world's finest single-origin beans. Each brew is a ritual.
+      </p>
+    </div>
+
+    <div class="specials-grid">
+      <div class="coffee-card reveal reveal-delay-1">
+        <div class="card-tag">★ Best Seller</div>
+        <div class="card-num">01</div>
+        <svg class="card-icon" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="28" cy="28" r="27" stroke="#c9a84c" stroke-width="0.8" opacity="0.3"/>
+          <path d="M18 32 Q28 18 38 32" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+          <path d="M20 36 Q28 23 36 36" stroke="#c9a84c" stroke-width="0.8" fill="none" opacity="0.6"/>
+        </svg>
+        <div class="card-name">Midnight Espresso</div>
+        <div class="card-desc">Double-shot Ethiopian Yirgacheffe, cold-pressed, with a dark chocolate finish and a whisper of citrus zest.</div>
+        <div class="card-price">₹ 280</div>
+      </div>
+
+      <div class="coffee-card reveal reveal-delay-2">
+        <div class="card-tag">✦ Chef's Pick</div>
+        <div class="card-num">02</div>
+        <svg class="card-icon" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="28" cy="28" r="27" stroke="#c9a84c" stroke-width="0.8" opacity="0.3"/>
+          <circle cx="28" cy="28" r="10" stroke="#c9a84c" stroke-width="1.2"/>
+          <circle cx="28" cy="28" r="4" fill="#c9a84c" opacity="0.4"/>
+        </svg>
+        <div class="card-name">Golden Pour</div>
+        <div class="card-desc">Single-origin Colombian Supremo, slow pour-over method, 4-minute bloom. Notes of caramel, walnut & dried fruit.</div>
+        <div class="card-price">₹ 320</div>
+      </div>
+
+      <div class="coffee-card reveal reveal-delay-3">
+        <div class="card-tag">❄ Fan Favourite</div>
+        <div class="card-num">03</div>
+        <svg class="card-icon" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="28" cy="28" r="27" stroke="#c9a84c" stroke-width="0.8" opacity="0.3"/>
+          <path d="M14 28 L42 28M28 14 L28 42M18 18 L38 38M38 18 L18 38" stroke="#c9a84c" stroke-width="0.8" opacity="0.5"/>
+          <circle cx="28" cy="28" r="5" stroke="#c9a84c" stroke-width="1.2"/>
+        </svg>
+        <div class="card-name">Cold Noir</div>
+        <div class="card-desc">18-hour cold brew steep with Guatemalan dark roast. Silky-smooth, no bitterness — served over hand-cut ice.</div>
+        <div class="card-price">₹ 350</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="reviews" id="reviews">
+    <div class="reviews-header reveal">
+      <div class="stars">★★★★★</div>
+      <div class="section-label">What People Say</div>
+      <h2 class="section-title">Stories from<br/><em style="font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--gold-light)">Our Guests</em></h2>
+    </div>
+
+    <div class="reviews-grid">
+      <div class="review-card reveal reveal-delay-1">
+        <div class="review-quote">"</div>
+        <p class="review-text">The Midnight Espresso hit different. I've been to specialty cafes all over Mumbai but Noir & Brew has something rare — a quiet, intentional energy that you feel in every sip.</p>
+        <div class="review-footer">
+          <div class="reviewer-avatar">A</div>
+          <div>
+            <div class="reviewer-name">Aanya Sharma</div>
+            <div class="reviewer-location">Bandra, Mumbai</div>
+            <div class="review-stars">★★★★★</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card reveal reveal-delay-2">
+        <div class="review-quote">"</div>
+        <p class="review-text">The Golden Pour changed how I think about filter coffee. It's not just a drink here — it's an experience. The space, the aroma, the attention to detail. Pure magic.</p>
+        <div class="review-footer">
+          <div class="reviewer-avatar">R</div>
+          <div>
+            <div class="reviewer-name">Rohan Mehta</div>
+            <div class="reviewer-location">Powai, Mumbai</div>
+            <div class="review-stars">★★★★★</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card reveal reveal-delay-3">
+        <div class="review-quote">"</div>
+        <p class="review-text">Cold Noir on a hot afternoon — that's the formula. The staff know their craft deeply, and the ambience feels like stepping into a different, slower world. My go-to spot now.</p>
+        <div class="review-footer">
+          <div class="reviewer-avatar">P</div>
+          <div>
+            <div class="reviewer-name">Priya Nair</div>
+            <div class="reviewer-location">Andheri, Mumbai</div>
+            <div class="review-stars">★★★★★</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card reveal reveal-delay-1">
+        <div class="review-quote">"</div>
+        <p class="review-text">I work from here every Thursday. The lighting, the playlist, and that espresso — it's the perfect productivity ritual. Noir & Brew isn't just a café, it's a third space done right.</p>
+        <div class="review-footer">
+          <div class="reviewer-avatar">K</div>
+          <div>
+            <div class="reviewer-name">Karan Joshi</div>
+            <div class="reviewer-location">Juhu, Mumbai</div>
+            <div class="review-stars">★★★★★</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card reveal reveal-delay-2">
+        <div class="review-quote">"</div>
+        <p class="review-text">Finally, a place that treats coffee the way it deserves. Every detail — from the bean sourcing to the pour temperature — is considered. This is the best cup of coffee in the city.</p>
+        <div class="review-footer">
+          <div class="reviewer-avatar">S</div>
+          <div>
+            <div class="reviewer-name">Sneha Kulkarni</div>
+            <div class="reviewer-location">Dadar, Mumbai</div>
+            <div class="review-stars">★★★★★</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card reveal reveal-delay-3">
+        <div class="review-quote">"</div>
+        <p class="review-text">Brought my family here for a Sunday brunch and everyone fell in love. The Cold Noir converted my chai-only father into a coffee person. That alone deserves six stars.</p>
+        <div class="review-footer">
+          <div class="reviewer-avatar">D</div>
+          <div>
+            <div class="reviewer-name">Dev Malhotra</div>
+            <div class="reviewer-location">Colaba, Mumbai</div>
+            <div class="review-stars">★★★★★</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <div class="contact-text reveal">
+      <div class="section-label">Get In Touch</div>
+      <h2 class="section-title">Come Say<br/><em style="font-style:italic; color:var(--gold-light)">Hello.</em></h2>
+      <p>Whether it's a reservation, a private event, or simply a question — we'd love to hear from you. Reach out and we'll respond within 24 hours.</p>
+      <div class="contact-info">
+        <div class="contact-item">
+          <svg class="contact-item-icon" viewBox="0 0 18 18" fill="none">
+            <path d="M9 1C5.7 1 3 3.7 3 7c0 4.5 6 10 6 10s6-5.5 6-10c0-3.3-2.7-6-6-6z" stroke="#c9a84c" stroke-width="1"/>
+            <circle cx="9" cy="7" r="2" stroke="#c9a84c" stroke-width="1"/>
+          </svg>
+          <div>
+            <div class="contact-item-label">Address</div>
+            <div class="contact-item-text">47 Chapel Road, Bandra West<br/>Mumbai, Maharashtra 400050</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <svg class="contact-item-icon" viewBox="0 0 18 18" fill="none">
+            <circle cx="9" cy="9" r="8" stroke="#c9a84c" stroke-width="1"/>
+            <path d="M9 5v4l3 2" stroke="#c9a84c" stroke-width="1" stroke-linecap="round"/>
+          </svg>
+          <div>
+            <div class="contact-item-label">Hours</div>
+            <div class="contact-item-text">Mon – Fri: 7:30 AM – 9 PM<br/>Sat – Sun: 8 AM – 10 PM</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <svg class="contact-item-icon" viewBox="0 0 18 18" fill="none">
+            <path d="M3 3h12v10a2 2 0 01-2 2H5a2 2 0 01-2-2V3z" stroke="#c9a84c" stroke-width="1"/>
+            <path d="M3 3l6 6 6-6" stroke="#c9a84c" stroke-width="1"/>
+          </svg>
+          <div>
+            <div class="contact-item-label">Email</div>
+            <div class="contact-item-text">hello@noirandivy.in</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal reveal-delay-2">
+      <div class="contact-form" id="contactForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" id="fname" placeholder="Aanya Sharma">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="femail" placeholder="hello@email.com">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Subject</label>
+          <input type="text" id="fsubject" placeholder="Reservation, Event, Feedback…">
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea id="fmessage" placeholder="Tell us more…"></textarea>
+        </div>
+        <button class="form-submit" onclick="submitForm()">Send Message</button>
+      </div>
+      <div class="form-success" id="formSuccess">
+        <div class="check">✦</div>
+        <h3>Message Received</h3>
+        <p>Thank you for reaching out. We'll be in touch within 24 hours.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-brand">Noir & Ivy</div>
+    <div class="footer-links">
+      <a href="#home">Home</a>
+      <a href="#specials">Menu</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="footer-copy">© 2025 Noir & Ivy. All rights reserved.</div>
+  </footer>
+
+  <script>
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
+    });
+
+    function animateRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.width = '18px';
+        cursor.style.height = '18px';
+        cursor.style.background = 'var(--gold-light)';
+        ring.style.width = '56px';
+        ring.style.height = '56px';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.width = '10px';
+        cursor.style.height = '10px';
+        cursor.style.background = 'var(--gold)';
+        ring.style.width = '36px';
+        ring.style.height = '36px';
+      });
+    });
+
+    // Scroll reveal
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Form submit
+    function submitForm() {
+      const name = document.getElementById('fname').value.trim();
+      const email = document.getElementById('femail').value.trim();
+      const message = document.getElementById('fmessage').value.trim();
+
+      if (!name || !email || !message) {
+        // Shake effect on empty
+        const form = document.getElementById('contactForm');
+        form.style.animation = 'none';
+        form.style.transition = 'transform 0.1s';
+        let s = 0;
+        const shake = setInterval(() => {
+          form.style.transform = s % 2 === 0 ? 'translateX(6px)' : 'translateX(-6px)';
+          s++;
+          if (s > 6) { clearInterval(shake); form.style.transform = ''; }
+        }, 60);
+        return;
+      }
+
+      document.getElementById('contactForm').style.display = 'none';
+      document.getElementById('formSuccess').style.display = 'block';
+    }
+
+    // Smooth nav hide on scroll
+    let lastScroll = 0;
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      const current = window.scrollY;
+      if (current > lastScroll && current > 100) {
+        nav.style.opacity = '0';
+        nav.style.transform = 'translateY(-10px)';
+      } else {
+        nav.style.opacity = '1';
+        nav.style.transform = 'translateY(0)';
+      }
+      nav.style.transition = 'opacity 0.4s, transform 0.4s';
+      lastScroll = current;
+    });
+  </script>
+</body>
+</html>
